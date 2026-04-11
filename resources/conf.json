@@ -1,0 +1,25 @@
+{
+  "nc": 3,
+  "dens": 0.5,
+  "titulo_sim": "HS",
+  "n_step": 500,
+  "intervalo_print": 50,
+  "i_ratio": 5,
+  "ngr": 100,
+  "sigmar": 3.405,
+  "generar_graficas": true,
+  "color": true,
+  "dir_graficas": "archives\\graficas",
+  "dir_pdb": "archives\\pdb",
+  "dir_dat": "archives\\datos",
+
+  "grap_gr_name": "gr.png",
+  "grap_presion_name": "presion.png",
+  "gr_dat_name": "gr.dat",
+  "presion_dat_name": "presion.dat",
+  "pdb_inicial": "FotoInicial.pdb",
+  "pdb_final": "FotoFinal.pdb",
+
+  "separador_datos": ", ",
+  "renderizar_pdb": false
+}
