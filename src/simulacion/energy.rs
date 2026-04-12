@@ -3,7 +3,7 @@ use crate::configuracion::variables::Configuracion;
 pub fn energy (
   conf: &mut Configuracion, 
   rxi: f64, ryi: f64, rzi: f64, 
-  i: usize, sigma: f64
+  i: usize
 ) -> bool 
 {
   for j in 0..conf.nfcc {
@@ -18,7 +18,7 @@ pub fn energy (
 
     let rij: f64 = (rxij*rxij + ryij*ryij + rzij*rzij).sqrt();
 
-    if rij < sigma {
+    if rij < conf.sigma {
       return true;
     }
   }

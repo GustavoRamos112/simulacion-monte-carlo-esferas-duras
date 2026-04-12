@@ -1,7 +1,6 @@
 use crate::configuracion::variables::Configuracion;
 
-pub fn sumup(conf: &mut Configuracion, sigma: f64) -> bool{
-  //let sigsq = sigma * sigma;
+pub fn sumup(conf: &mut Configuracion) -> bool{
 
   for i in 0..conf.nfcc-1 {
     let rxi: f64 = conf.rx[i];
@@ -19,7 +18,7 @@ pub fn sumup(conf: &mut Configuracion, sigma: f64) -> bool{
 
       let rij: f64 = (rxij*rxij + ryij*ryij + rzij*rzij).sqrt();
 
-      if rij < sigma {
+      if rij < conf.sigma {
         return true;
       }
     }

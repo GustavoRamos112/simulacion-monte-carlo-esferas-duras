@@ -53,14 +53,14 @@ pub fn ejecutar_simulacion(
     )
   }
 
-  let sigma: f64 = 1.0;
+  //let sigma: f64 = 1.0;
   let mut drmax: f64 = 0.15;
 
   conf.volumen = conf.boxx * conf.boxy * conf.boxz;
 
   imprimir_tabla(&conf, &conf_u);
 
-  if sumup(&mut conf, sigma) { 
+  if sumup(&mut conf) { 
     eprintln!("Overlap en la configuracion inicial");
     std::process::exit(1); 
   }
@@ -69,9 +69,11 @@ pub fn ejecutar_simulacion(
 
   println!("Empezando la cadena de Markov");
   println!("Paso\tRadio");
-
+  //? Bucle for principal
   for i_step in 1..=conf_u.n_step {
+    //? Bucle for para mover cada particula
     for i in 0..conf.nfcc {
+      //? Movemos la aprticula aleatoriamente
       let rx_i_old: f64 = conf.rx[i];
       let ry_i_old: f64 = conf.ry[i];
       let rz_i_old: f64 = conf.rz[i];
@@ -79,25 +81,26 @@ pub fn ejecutar_simulacion(
       let mut rx_i_new: f64 = rx_i_old + (2.0 * fastrand::f64() - 1.0) * drmax;
       let mut ry_i_new: f64 = ry_i_old + (2.0 * fastrand::f64() - 1.0) * drmax;
       let mut rz_i_new: f64 = rz_i_old + (2.0 * fastrand::f64() - 1.0) * drmax;
-
+      //? Aseguramos que la particula no se mueva fuera de la caja
       rx_i_new -= (rx_i_new*conf.boxix).round()*conf.boxx;
       ry_i_new -= (ry_i_new*conf.boxiy).round()*conf.boxy;
       rz_i_new -= (rz_i_new*conf.boxiz).round()*conf.boxz;
-
+      //? Verificamos si hay solapamiento
       if energy(
         &mut conf, 
         rx_i_new, ry_i_new, rz_i_new,
-        i, sigma
+        i
       ) { continue }
-
+      //? Si no, actualizamos la posicion
       conf.rx[i] = rx_i_new;
       conf.ry[i] = ry_i_new;
       conf.rz[i] = rz_i_new;
       acmmva += 1.0;
     }
-
+    //? Ajustamos drmax
     let mut ratio: f64 = 0.0;
-
+    //? Si es el paso actual multiplo de i_step
+    //? ajustamos drmax
     if i_step%conf_u.i_ratio == 0 {
       ratio = acmmva / ((conf.nfcc*conf_u.i_ratio) as f64);
       if ratio > 0.5 {
@@ -113,7 +116,7 @@ pub fn ejecutar_simulacion(
     }
 
     if i_step%conf_u.ngr == 0 {
-      nrdf(&mut conf, sigma);
+      nrdf(&mut conf);
       //println!("Ejecutando nrdf")
     }
 

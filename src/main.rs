@@ -20,16 +20,18 @@ use pdb_view::view_pdb::view_pdb;
 fn main() {
   //? Se leen los parametros desde un archivo de configuracion
   let conf_u: leer_conf::ConfUsuario = leer_conf::cargar_conf_usuario();
-  //? Llamamos a la funcion establecer_configuracion
   let mut conf: Configuracion = Configuracion::new(conf_u.nc, conf_u.dens);
+  //? Establecemos la configuracion de la simulacion
   let _ = establecer_configuracion(
     &mut conf, &conf_u.color, 
     format!("{}\\{}", conf_u.dir_pdb, conf_u.pdb_inicial).as_str(), 
     &conf_u.sigmar
   );
-  
+  //? Imprimimos las instrucciones
   instrucciones(&conf_u.color);
+  //? Se ejecuta el programa interactivo
   loop {
+    //? Leemos la opcion escogida
     let mut opcion: String = String::new();
     println!("Opcion: ");
     std::io::stdin()
@@ -42,33 +44,36 @@ fn main() {
     };
 
     match opcion_i {
+      //? En caso que la opcion sea > 5 o no sea valida
       0_u8 => {
         println!("Instruccion no valida");
-        //instrucciones(&conf_u.color);
+        instrucciones(&conf_u.color);
       },
+      //? Iniciamos la simulacion
       1_u8 => {
-        //? Iniciamos la simulacion
         ejecutar_simulacion_cof_usr(&mut conf, &conf_u);
       },
+      //? Generamos las graficas
       2_u8 => {
         generar_graficas_pasadas(&mut conf, &conf_u);
       },
+      //? Visualizamos el PDB inicial
       3_u8 => {
-        //? generamos el PDB inicial
         view_pdb_pasado(
           &mut conf, 
           &conf_u.sigmar,
           format!("{}\\{}", conf_u.dir_pdb, conf_u.pdb_inicial).as_str()
         );
       },
+      //? Visualizamos el PDB final
       4_u8 => {
-        //? generamos el PDB final
         view_pdb_pasado(
           &mut conf, 
           &conf_u.sigmar,
           format!("{}\\{}", conf_u.dir_pdb, conf_u.pdb_final).as_str()
         );
       },
+      //? Sale del programa
       5_u8 => {
         std::process::exit(0);
       },
@@ -108,21 +113,20 @@ fn ejecutar_simulacion_cof_usr( conf_i: &mut Configuracion, conf_u_i: &leer_conf
   );
   if conf_u.generar_graficas {
     //? Graficas
-    if conf_u.color {
-      println!(
-        "{}\n{}\n{}",
-        "┌────────────────────┐".yellow(),
-        "│ Generando graficas │".yellow(),
-        "└────────────────────┘".yellow()
-      );
-    } else {
-      println!(
-        "{}\n{}\n{}",
-        "┌────────────────────┐",
-        "│ Generando graficas │",
-        "└────────────────────┘"
-      );
+    let grap_print: Vec<&str> = vec![
+      "┌────────────────────┐",
+      "│ Generando graficas │",
+      "└────────────────────┘"
+    ];
+    
+    for i in grap_print {
+      if conf_u.color {
+        println!("{}", i.yellow());
+      } else {
+        println!("{}", i);
+      }
     }
+
     let _ = g_presion(
       &conf, 
       format!("{}\\{}", conf_u.dir_graficas, conf_u.grap_presion_name).as_str()
@@ -148,12 +152,15 @@ fn ejecutar_simulacion_cof_usr( conf_i: &mut Configuracion, conf_u_i: &leer_conf
       );
     }
   }
-
+  //? Visualizamos el PDB final
   if conf_u.renderizar_pdb {
     view_pdb(&conf, &conf_u.sigmar, &true);
   }
 }
 
+//? Funcion que permite generar graficas con
+//? los ficheros de datos de G(R) y presion
+//? definidos en el json
 fn generar_graficas_pasadas(conf: &mut Configuracion, conf_u: &leer_conf::ConfUsuario) {
   if conf_u.color {
     println!(
@@ -171,10 +178,12 @@ fn generar_graficas_pasadas(conf: &mut Configuracion, conf_u: &leer_conf::ConfUs
     );
   }
 
+  //? Comprobamos que existan los archivos de datos (g(r))
   let mut dir = format!("{}\\{}", conf_u.dir_dat, conf_u.gr_dat_name);
   let mut dir_interno = dir.clone();
   let mut i: usize = 0;
   match std::fs::exists(dir) {
+    //? Si existe, leemos los datos
     Ok(_) => {  
       let push_vec: bool = conf.r0.len() == 0;
 
@@ -196,12 +205,14 @@ fn generar_graficas_pasadas(conf: &mut Configuracion, conf_u: &leer_conf::ConfUs
         format!("{}\\{}", conf_u.dir_graficas, conf_u.grap_gr_name).as_str()
       ).unwrap();
     },
+    //? Si no, imprimimos un error
     Err(_) => {
       println!("No se encontro el archivo de datos de gr");
       println!("Ejecute una simulacion o importe los archivos de datos a la ruta configurada");
     }
   }
 
+  //? Lo mismo para el archivo de datos de presion
   dir = format!("{}/{}", conf_u.dir_dat, conf_u.presion_dat_name);
   dir_interno = dir.clone();
   i = 0;
@@ -245,8 +256,10 @@ fn generar_graficas_pasadas(conf: &mut Configuracion, conf_u: &leer_conf::ConfUs
   }
 }
 
+//? Funcion que permite visualizar el pdb desde un archivo pdb
 fn view_pdb_pasado(conf: &mut Configuracion, sigmar: &f64, pdb_dir: &str) {
   let dir_interno = pdb_dir;
+  //? Comprobamos que exista el archivo pdb
   match std::fs::exists(pdb_dir) {
     Ok(_) => {
       let mut i: usize = 0;
