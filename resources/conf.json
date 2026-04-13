@@ -9,9 +9,9 @@
   "sigmar": 3.405,
   "generar_graficas": true,
   "color": true,
-  "dir_graficas": "archives\\graficas",
-  "dir_pdb": "archives\\pdb",
-  "dir_dat": "archives\\datos",
+  "dir_graficas": "archives/graficas",
+  "dir_pdb": "archives/pdb",
+  "dir_dat": "archives/datos",
 
   "grap_gr_name": "gr.png",
   "grap_presion_name": "presion.png",
