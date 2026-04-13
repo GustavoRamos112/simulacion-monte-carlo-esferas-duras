@@ -6,10 +6,10 @@
 Una simulacion Montecarlo es una tecnica de simulacion que estima los posibles resultados de un evento mediante la repeticion de eventos aleatorios.
 
 ### ¿Que es una cadena de Markov?
-Un modelo matematico estocastico que describe una secuancua de eventos donde la probabilidad de siguiente estado depende unicamente del estado actual, no de la historia de eventos.
+Un modelo matematico estocastico que describe una secuencia de eventos donde la probabilidad del siguiente estado depende unicamente del estado actual, no de la historia de eventos.
 
-### ¿Que es el algoritmo de metropolis?
-Metodo Montecarlo de cadena de Markov que genera una secuencua de muestras aleatorias a partir de una distribucion de probabilidad la cual es dificil muestrear directamente.
+### ¿Que es el algoritmo de Metropolis?
+Metodo Montecarlo de cadena de Markov que genera una secuencia de muestras aleatorias a partir de una distribucion de probabilidad la cual es dificil muestrear directamente.
 
 ### ¿Esferas duras?
 Se considera una esfera dura a una esfera con un radio sigma que se encuentra en un punto determinado en el espacio, es impenetrable, no ejerce fuerza a otras esferas a la distacia y tampoco puede solaparse con otra.
@@ -17,11 +17,11 @@ Se considera una esfera dura a una esfera con un radio sigma que se encuentra en
 ## Segunda parte: Explicacion del modelo
 
 ### Potencial
-En esferas duras no hay energia potencial continua; si hay solapamiento entre esferas, el potencial es inifinito, si no, es cero.
+En esferas duras no hay energia potencial continua; si hay solapamiento entre esferas, el potencial es infinito, si no, es cero.
 
 ### Simulacion
 #### 1: Delimitamos una caja
-Consideramos uan caja en el espacio donde encerramos el sistema de esferas duras.
+Consideramos una caja en el espacio donde encerramos el sistema de esferas duras.
 #### 2: Configuracion inicial
 Para cada esfera, asignamos un punto inicial dentro de la caja y despues verificamos que no haya solapamiento entre las esferas.
 #### 3: Actualizacion de posiciones
@@ -32,13 +32,12 @@ Se toma una esfera de la configuracion y se mueve a lo largo de los tres ejes de
 #### Requisitos
 Para la ejecucion de este codigo se usaran los paquetes:
 
-```` lua
-fastrand -> Para generar numeros aleatorios rapidamente
-plotters -> Generar graficas
-raylib -> Visualizar .pdb
-serde, serde_json -> Leer json
-colored, tabled -> Añadir color y tablas
-````
+- [fastrand](https://docs.rs/fastrand/latest/fastrand/) - Generacion de numeros aleatorios
+- [plotters](https://docs.rs/plotters/latest/plotters/) - Generacion de graficas
+- [raylib](https://docs.rs/raylib/latest/raylib/) - Visualizacion 3D de archivos PDB
+- [serde](https://serde.rs/) - Serializacion de configuracion JSON
+- [tabled](https://docs.rs/tabled/latest/tabled/) - Tablas en consola
+- [colored](https://docs.rs/colored/latest/colored/) - Colores en terminal
 #### Capacidades del codigo
 El codigo presenta una tabla de comandos:
 ```` bash
@@ -68,29 +67,33 @@ El codigo presenta una tabla de comandos:
 #### I - Configuracion
 Por comodidad, estas variables se estableceran en un json (resources\conf.json) que se lee y se almacena en una estructura de tipo `ConfUsuario` (src\configuracion\leer_conf.rs)
 
-````c
-nc: int (define el numero de repeticiones en cada direccion, se usa para calcular el numero total de particulas)
-dens: float (densidad adimensional del fluido)
-titulo_sim: string (titulo de la simulacion)
-n_step: int (numero de pasos de la simulacion)
-intervalo_print: int (intervalo de impresion del estado de la simulacion)
-i_ratio: int (intervalo de actualizacion del radio de aceptacion <~50%>)
-ngr: int (numeros de oasis para calcular el G(R))
-sigmar: float (Factor de escala para visualizar el .pdb)
-generar_graficas: bool (indica si al finalizar la simulacion se generan graficas)
-color: bool (indica si se debe mostrar colores en la consola)
-dir_graficas: string (directorio donde se guardan las graficas)
-dir_pdb: string (directorio donde se guardan los .pdb)
-dir_dat: string (directorio donde se guardan los .dat)
-grap_gr_name: string (nombre de la grafica de G(R))
-grap_presion_name: string (nombre de la grafica de presion)
-gr_dat_name: string (nombre del archivo de datos de G(R))
-presion_dat_name: string (nombre del archivo de datos de presion)
-pdb_inicial: string (nombre del pdb inicial)
-pdb_final: string (nombre del pdb final)
-separador_datos: string (separador de los datos en los archivos de datos <recomendado " ,">)
-renderizar_pdb: bool (indica si se debe de visualizar el pdb al finalizar la simulacion)
-````
+Todos los parametros de simulacion se configuran en `resources/conf.json`:
+
+```json
+{
+  "nc": 3,                    // Numero de repeticiones en cada direccion (n_particulas = nc^3)
+  "dens": 0.5,                // Densidad adimensional del fluido
+  "titulo_sim": "HS",         // Titulo de la simulacion
+  "n_step": 5000,             // Numero de pasos de la simulacion
+  "intervalo_print": 500,     // Intervalo de impresion de progreso
+  "i_ratio": 5,               // Intervalo de actualizacion del radio de aceptacion
+  "ngr": 100,                 // Intervalo para calculo de g(r)
+  "sigmar": 3.405,            // Factor de escala para visualizar PDB
+  "generar_graficas": true,   // Generar graficas al finalizar
+  "color": true,              // Mostrar colores en consola
+  "renderizar_pdb": false,    // Visualizar PDB al finalizar
+  "dir_graficas": "archives/graficas", // Directorio donde se guardan las graficas
+  "dir_pdb": "archives/pdb", // Directorio donde se guardan los .pdb
+  "dir_dat": "archives/datos", // Directorio donde se guardan los .dat
+  "grap_gr_name": "gr.png", // Nombre de la grafica de G(R)
+  "grap_presion_name": "presion.png", // Nombre de la grafica de presion
+  "gr_dat_name": "gr.dat", // Nombre del archivo de datos de G(R)
+  "presion_dat_name": "presion.dat", // Nombre del archivo de datos de presion
+  "pdb_inicial": "FotoInicial.pdb", // Nombre del pdb inicial
+  "pdb_final": "FotoFinal.pdb", // Nombre del pdb final
+  "separador_datos": ", " // Separador de los datos en los archivos de datos <recomendado " ,">
+}
+```
 
 #### II - Configuracion
 Se establecen todas las variables que usaremos en la simulacion en una estructura de tipo `Configuracion` (src\configuracion\variables.rs) dentro de este archivo se encuentra la explicacion de cada variable.
@@ -116,12 +119,12 @@ Para mover una particula, hacemos uso de
 let mut rx_i_new: f64 = rx_i_old + (2.0 * fastrand::f64() - 1.0) * drmax;
 ````
 
-se verifican que las aprticulas no se muevan fuera de la caja
+se verifican que las particulas no se muevan fuera de la caja
 ```` rust
 rx_i_new -= (rx_i_new*conf.boxix).round()*conf.boxx;
 ````
 
-En este caso, guardamos el valor en una nueva variable para despues hacer uso de la funcion `energy` (src\simulacion\energy.rs) para verificar si hay o no slapamiento con otra particula.
+En este caso, guardamos el valor en una nueva variable para despues hacer uso de la funcion `energy` (src\simulacion\energy.rs) para verificar si hay o no solapamiento con otra particula.
 
 ```` rust
 if energy(
@@ -159,7 +162,7 @@ if i_step % conf_u.i_ratio == 0 {
 }
 ````
 
-Imrpimimos el progreso de la simulacion:
+Imprimimos el progreso de la simulacion:
 ```` rust
 if i_step % conf_u.intervalo_print == 0 {
   println!("{}\t{}", i_step, ratio);
@@ -181,3 +184,77 @@ Esta secion no sera tan detallada.
 Para visualizar el pdb, se usa el codigo de rust de [raylib-rs](https://docs.rs/raylib/latest/raylib/) (src\pdb_view\view_pdb.rs).
 
 Para generar graficas, se usa el codigo de rust de [plotters](https://docs.rs/plotters/latest/plotters/) (src\graficas\g_gr.rs y src\graficas\g_presion.rs).
+
+---
+
+## Cuarta parte: Instalacion y compilacion
+
+### Requisitos del sistema
+- **Rust** 1.70+ ([instalar](https://rustup.rs/))
+- **CMake** (para compilar dependencias nativas de raylib)
+
+#### Windows:
+- MSVC v14.3 - VS 2022 C++ x64/x86 build tools (https://visualstudio.microsoft.com/es/downloads/)
+
+#### Linux:
+```` bash
+sudo apt install build-essential git
+````
+Para las dependencias de raylib, visitar: https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux
+
+
+### Compilacion
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/GustavoRamos112/simulacion-monte-carlo-esferas-duras.git
+cd simulacion-monte-carlo-esferas-duras
+
+# Compilar en modo debug
+cargo build
+
+# Compilar en modo release (recomendado para simulaciones)
+cargo build --release
+
+# Ejecutar
+cargo run --release
+```
+
+---
+
+## Quinta parte: Resultados
+
+### Archivos de salida
+
+La simulacion genera los siguientes archivos:
+
+| Archivo | Descripcion |
+|---------|-------------|
+| `*.pdb` | Configuracion atomica en formato PDB |
+| `gr.dat` | Datos de la funcion de distribucion radial g(r) |
+| `presion.dat` | Datos de presion y factor de compresibilidad |
+| `gr.png` | Grafica de g(r) |
+| `presion.png` | Grafica de presion |
+
+### Parametros fisicos calculados
+
+- **g(r)**: Funcion de distribucion radial
+- **P**: Presion del sistema
+- **Z**: Factor de compresibilidad (PV/NkT)
+- **Cs**: Factor de compresibilidad isotropico
+
+---
+
+## Sexta parte: Licencia
+
+<div align="center">
+
+[![GNU GPLv3 Image](https://www.gnu.org/graphics/gplv3-127x51.png)](http://www.gnu.org/licenses/gpl-3.0.en.html)
+
+</div>
+
+<div align="left">
+
+Puedes copiar, distribuir y modificar el software siempre que registres los cambios y las fechas en los archivos fuente. Cualquier modificación del software, incluido el código con licencia GPL (mediante compilación), también debe estar disponible bajo la licencia GPL, junto con las instrucciones de compilación e instalación.
+
+</div>
