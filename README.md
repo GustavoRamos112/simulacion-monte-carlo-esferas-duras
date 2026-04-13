@@ -196,6 +196,11 @@ Para generar graficas, se usa el codigo de rust de [plotters](https://docs.rs/pl
 #### Windows:
 - MSVC v14.3 - VS 2022 C++ x64/x86 build tools (https://visualstudio.microsoft.com/es/downloads/)
 
+Para la compilacion de raylib, es necesario isntalar LLVM (https://github.com/llvm/llvm-project), agregar el directorio bin al Path y ademas ejecutar en PowerShell:
+```` powershell
+setx LIBCLANG_PATH "dir_absoluto_LLVM\bin"
+````
+
 #### Linux:
 ```` bash
 sudo apt install build-essential git
